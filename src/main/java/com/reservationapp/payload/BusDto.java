@@ -1,24 +1,25 @@
 package com.reservationapp.payload;
 
 import com.reservationapp.entity.Driver;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BusDto {
     private int busId;
     private String busNumber;
     private String busType;
-    private String fromLocation;
-    private String toLocation;
-    private String fromDate;
-    private String toDate;
-    private int totalDuration;
-    private String fromTime;
-    private String toTime;
     private double price;
     private int totalSeats;
     private int availableSeats;
-    private Driver driver;
+    private RouteDto route;
+    private List<SubRouteDto> subRoute;
+    // Getters and setters
 }
+

@@ -25,14 +25,8 @@ public class BusController {
 
     //http:localhost:8080/api/v1/bus/add
     @PostMapping("/add")
-    public ResponseEntity<BusDto> addBus(
-           @RequestBody BusDto busDto
-            ) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd MM yyyy");
-        Date fromDate = formatter.parse(busDto.getFromDate());
-        Date toDate = formatter.parse(busDto.getToDate());
-
-        BusDto dto = busService.addBus(busDto);
-        return new ResponseEntity<>(dto,HttpStatus.CREATED);
+    public ResponseEntity<String> addBus( @RequestBody BusDto busDto) throws ParseException {
+        busService.addBus(busDto);
+        return new ResponseEntity<>("Bus detalis saved",HttpStatus.CREATED);
     }
 }

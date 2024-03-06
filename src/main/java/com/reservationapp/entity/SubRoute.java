@@ -9,19 +9,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Bus {
+public class SubRoute {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int busId;
+    private Long id;
 
-    private String busNumber;
-    private String busType;
-    private double price;
-    private int totalSeats;
-    private int availableSeats;
+    private String fromLocation;
+    private String toLocation;
+    private String fromDate;
+    private String toDate;
+    private int totalDuration;
+    private String fromTime;
+    private String toTime;
 
-    @OneToOne(mappedBy = "bus")
+    @ManyToOne
+    @JoinColumn(name = "route_id")
     private Route route;
 
     // getters and setters
 }
+

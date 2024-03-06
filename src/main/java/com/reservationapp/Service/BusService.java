@@ -2,57 +2,76 @@ package com.reservationapp.Service;
 
 import com.reservationapp.Repository.BusRepository;
 import com.reservationapp.Repository.DriverRepository;
+import com.reservationapp.Repository.RouteRepository;
+import com.reservationapp.Repository.SubRouteRepository;
 import com.reservationapp.entity.Bus;
+import com.reservationapp.entity.Route;
+import com.reservationapp.entity.SubRoute;
 import com.reservationapp.payload.BusDto;
+import com.reservationapp.payload.SubRouteDto;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class BusService {
     @Autowired
     private BusRepository busRepository;
     @Autowired
+    private RouteRepository routeRepository;
+
+    @Autowired
+    private SubRouteRepository subRouteRepository;
+    @Autowired
     private DriverRepository driverRepository;
 
-    public BusDto addBus(BusDto busDto){
-        Bus bus = mapToEntity(busDto);
-        driverRepository.save(busDto.getDriver());
-        Bus savedBus = busRepository.save(bus);
-        return   mapToDto(savedBus);
-    }
-    Bus mapToEntity(BusDto dto){
+    @Transactional
+    public void addBus(BusDto busDto) {
+
+        //cretae Route entity
+        Route route = new Route();
+        route.setFromLocation(busDto.getRoute().getFromLocation());
+        route.setToLocation(busDto.getRoute().getToLocation());
+        route.setFromDate(busDto.getRoute().getFromDate());
+        route.setToDate(busDto.getRoute().getToDate());
+        route.setTotalDuration(busDto.getRoute().getTotalDuration());
+        route.setFromTime(busDto.getRoute().getFromTime());
+        route.setToTime(busDto.getRoute().getToTime());
+
+        Route savedRoute = routeRepository.save(route);
+
         Bus bus = new Bus();
-        bus.setBusNumber(dto.getBusNumber());
-        bus.setBusType(dto.getBusType());
-        bus.setFromLocation(dto.getFromLocation());
-        bus.setToLocation(dto.getToLocation());
-        bus.setFromDate(dto.getFromDate());
-        bus.setToDate(dto.getToDate());
-        bus.setTotalDuration(dto.getTotalDuration());
-        bus.setFromTime(dto.getFromTime());
-        bus.setToTime(dto.getToTime());
-        bus.setPrice(dto.getPrice());
-        bus.setTotalSeats(dto.getTotalSeats());
-        bus.setAvailableSeats(dto.getAvailableSeats());
-        bus.setDriver(dto.getDriver());
-        return bus;
-    }
-    BusDto mapToDto(Bus bus){
-        BusDto dto = new BusDto();
-        dto.setBusId(bus.getBusId());
-        dto.setBusNumber(bus.getBusNumber());
-        dto.setBusType(bus.getBusType());
-        dto.setFromLocation(bus.getFromLocation());
-        dto.setToLocation(bus.getToLocation());
-        dto.setFromDate(bus.getFromDate());
-        dto.setToDate(bus.getToDate());
-        dto.setTotalDuration(bus.getTotalDuration());
-        dto.setFromTime(bus.getFromTime());
-        dto.setToTime(bus.getToTime());
-        dto.setPrice(bus.getPrice());
-        dto.setTotalSeats(bus.getTotalSeats());
-        dto.setAvailableSeats(bus.getAvailableSeats());
-        dto.setDriver(bus.getDriver());
-        return dto;
+        bus.setBusNumber(busDto.getBusNumber());
+        bus.setBusType(busDto.getBusType());
+        bus.setPrice(busDto.getPrice());
+        bus.setTotalSeats(busDto.getTotalSeats());
+        bus.setAvailableSeats(busDto.getAvailableSeats());
+
+        bus.setRoute(route);
+
+        Bus savedBus = busRepository.save(bus);
+
+        Route routeUpdate = routeRepository.findById(savedRoute.getId()).get();
+        routeUpdate.setBus(savedBus);
+        routeRepository.save(routeUpdate);
+
+        if (busDto.getSubRoute() != null && !busDto.getSubRoute().isEmpty()) {
+            for (SubRouteDto subRouteDto : busDto.getSubRoute()) {
+                SubRoute subRoute = new SubRoute();
+                subRoute.setFromLocation(subRouteDto.getFromLocation());
+                subRoute.setToLocation(subRouteDto.getToLocation());
+                subRoute.setFromDate(subRouteDto.getFromDate());
+                subRoute.setToDate(subRouteDto.getToDate());
+                subRoute.setTotalDuration(subRouteDto.getTotalDuration());
+                subRoute.setFromTime(subRouteDto.getToTime());
+                subRoute.setToTime(subRouteDto.getToTime());
+
+                subRoute.setRoute(route);
+
+                subRouteRepository.save(subRoute);
+            }
+        }
     }
 }
